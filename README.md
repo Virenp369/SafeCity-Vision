@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SafeCity Vision
 
 AI-powered crime pattern prediction and forensic analytics platform for hotspot analysis, risk scoring, geospatial intelligence, and analyst briefings.
@@ -158,3 +159,7 @@ Optional:
 3. Backend: authenticated FastAPI endpoints, PostgreSQL storage, model registry.
 4. Deployment: Docker, Render/AWS hosting, CI checks, monitoring.
 5. Research: CCTV anomaly detection, patrol optimization, multi-agent analyst workflows.
+=======
+# SafeCity-Vision
+SafeCity Vision is an AI-powered crime intelligence and forensic analytics platform that analyzes historical crime data, predicts high-risk zones, identifies crime hotspots, and provides interactive dashboards, heatmaps, and AI-driven insights to support proactive public safety decision-making.
+>>>>>>> 5ea88b2a7b1ee7e86b0e88da4108781d6a9ae2f7
