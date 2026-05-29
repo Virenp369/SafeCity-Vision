@@ -1,0 +1,30 @@
+# SafeCity Vision non-secret configuration template
+
+app:
+  name: SafeCity Vision
+  environment: development
+  default_city: Chicago
+  records_limit: 1000
+
+model:
+  default_type: XGBoost
+  features:
+    - Hour
+    - DayOfWeek
+    - Temperature
+    - Is_Raining
+    - Dist_to_Transit
+
+data_sources:
+  chicago:
+    provider: Socrata
+    domain: data.cityofchicago.org
+    dataset_id: ijzp-q8t2
+  los_angeles:
+    provider: Socrata
+    domain: data.lacity.org
+    dataset_id: 2nrs-mtv8
+
+dashboard:
+  map_zoom: 11
+  high_risk_transit_distance_km: 1.0

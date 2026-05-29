@@ -1,0 +1,60 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+.env
+.env.local
+
+venv/
+.venv/
+
+ruvector.db
+*.db
+
+# Streamlit
+.streamlit/secrets.toml
+
+# VS Code
+.vscode/
+
+# JetBrains
+.idea/
+
+# Logs
+*.log
+
+# ML Models
+models/*.pkl
+models/*.joblib
+*.pkl
+*.joblib
+
+# Parquet Files
+*.parquet
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+data/raw/*
+data/interim/*
+data/cleaned/*
+data/processed/*
+data/exports/*
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/cleaned/.gitkeep
+!data/processed/.gitkeep
+!data/exports/.gitkeep
+
+reports/figures/*
+!reports/figures/.gitkeep
+
+maps/heatmaps/*
+maps/geojson/*
+maps/layers/*
+!maps/heatmaps/.gitkeep
+!maps/geojson/.gitkeep
+!maps/layers/.gitkeep
