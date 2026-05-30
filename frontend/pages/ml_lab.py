@@ -15,16 +15,17 @@ API_URL = "http://localhost:8000"
 
 
 def render_ml_models(session_id, df):
-    st.markdown(textwrap.dedent(f"""
-        <div class="mission-header" style="margin-bottom: 32px;">
-            <div>
-                <span class="eyebrow">Predictive Analytics</span>
-                <h1>Machine Learning Lab</h1>
-                <p>Train and deploy specialized intelligence architectures to forecast threat propagation.</p>
-            </div>
-            <div class="mission-pill" style="color: #38BDF8; border-color: rgba(56, 189, 248, 0.5); background: rgba(56, 189, 248, 0.1);">ENGINE STANDBY</div>
-        </div>
-    """), unsafe_allow_html=True)
+    header_html = f"""
+<div class="mission-header" style="margin-bottom: 32px;">
+<div>
+<span class="eyebrow">Predictive Analytics</span>
+<h1>Machine Learning Lab</h1>
+<p>Train and deploy specialized intelligence architectures to forecast threat propagation.</p>
+</div>
+<div class="mission-pill" style="color: #38BDF8; border-color: rgba(56, 189, 248, 0.5); background: rgba(56, 189, 248, 0.1);">ENGINE STANDBY</div>
+</div>
+"""
+    st.markdown(header_html, unsafe_allow_html=True)
 
     with st.container(border=True):
         model_selection = st.selectbox("Intelligence Architecture", ["XGBoost", "Random Forest", "Logistic Regression", "KMeans"])
@@ -81,27 +82,26 @@ def render_ml_models(session_id, df):
 
                         risk_color = "#10B981" if result.get('risk_score', 0) < 50 else "#F59E0B" if result.get('risk_score', 0) < 75 else "#EF4444"
 
-                        st.markdown(textwrap.dedent(f"""
-                            <div class="cyber-card" style="border-left: 4px solid {risk_color}; margin-top: 32px;">
-                                <div class="eyebrow" style="color: {risk_color} !important; margin-bottom: 12px;">Primary Threat Forecast</div>
-                                <h1 style="color: #f1f5f9 !important; font-size: 3.2rem; margin: 0 0 16px 0; font-weight: 800;">{result['prediction']}</h1>
-                                
-                                <div style="display: flex; gap: 24px; margin-bottom: 24px;">
-                                    <div>
-                                        <div style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 4px;">System Confidence</div>
-                                        <div style="color: #38BDF8; font-size: 1.5rem; font-weight: 700; font-family: 'Outfit', sans-serif;">{result['confidence']}%</div>
-                                    </div>
-                                    <div>
-                                        <div style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 4px;">Risk Score</div>
-                                        <div style="color: {risk_color}; font-size: 1.5rem; font-weight: 700; font-family: 'Outfit', sans-serif;">{result.get('risk_score', 50)}/100</div>
-                                    </div>
-                                </div>
-                                
-                                <div style="background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(148, 163, 184, 0.1); padding: 16px; border-radius: 8px;">
-                                    <span class="eyebrow" style="color: #38BDF8 !important; margin-bottom: 6px;">AI Rationale</span>
-                                    <p style="color: #CBD5E1; margin: 0; font-size: 0.95rem; line-height: 1.5;">{result['explanation']}</p>
-                                </div>
-                            </div>
-                        """), unsafe_allow_html=True)
+                        forecast_html = f"""
+<div class="cyber-card" style="border-left: 4px solid {risk_color}; margin-top: 32px;">
+<div class="eyebrow" style="color: {risk_color} !important; margin-bottom: 12px;">Primary Threat Forecast</div>
+<h1 style="color: #f1f5f9 !important; font-size: 3.2rem; margin: 0 0 16px 0; font-weight: 800;">{result['prediction']}</h1>
+<div style="display: flex; gap: 24px; margin-bottom: 24px;">
+<div>
+<div style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 4px;">System Confidence</div>
+<div style="color: #38BDF8; font-size: 1.5rem; font-weight: 700; font-family: 'Outfit', sans-serif;">{result['confidence']}%</div>
+</div>
+<div>
+<div style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 4px;">Risk Score</div>
+<div style="color: {risk_color}; font-size: 1.5rem; font-weight: 700; font-family: 'Outfit', sans-serif;">{result.get('risk_score', 50)}/100</div>
+</div>
+</div>
+<div style="background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(148, 163, 184, 0.1); padding: 16px; border-radius: 8px;">
+<span class="eyebrow" style="color: #38BDF8 !important; margin-bottom: 6px;">AI Rationale</span>
+<p style="color: #CBD5E1; margin: 0; font-size: 0.95rem; line-height: 1.5;">{result['explanation']}</p>
+</div>
+</div>
+"""
+                        st.markdown(forecast_html, unsafe_allow_html=True)
                     except Exception as e:
                         st.error(f"Inference failed. Ensure FastAPI is running. Error: {e}")

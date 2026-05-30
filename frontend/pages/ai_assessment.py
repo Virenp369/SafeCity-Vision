@@ -8,18 +8,33 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 from ai_assistant.integrations.forensic_assistant import ForensicAssistant
+from frontend.services.ai_service import check_gemini_connection
+from frontend.utils.insights import generate_local_intelligence, classify_intent
+import logging
+
+logger = logging.getLogger(__name__)
 
 def render_ai_assessment(df, api_key):
-    st.markdown(textwrap.dedent(f"""
-        <div class="mission-header" style="margin-bottom: 32px;">
-            <div>
-                <span class="eyebrow">Natural Language Interface</span>
-                <h1>AI Intelligence Assessment</h1>
-                <p>Direct interrogation link with the Palantir-Class Analyst. Query the dataset for hidden hotspots and tactical correlations.</p>
-            </div>
-            <div class="mission-pill" style="color: #F59E0B; border-color: rgba(245, 158, 11, 0.5); background: rgba(245, 158, 11, 0.1);">LINK ACTIVE</div>
-        </div>
-    """), unsafe_allow_html=True)
+    is_connected = check_gemini_connection(api_key) if api_key else False
+    
+    if is_connected and not df.empty:
+        status_indicator = "🟢 AI + Dataset Intelligence"
+    elif not is_connected and not df.empty:
+        status_indicator = "🟡 Dataset Intelligence Only"
+    else:
+        status_indicator = "🔴 Intelligence Services Offline"
+    
+    header_html = f"""
+<div class="mission-header" style="margin-bottom: 32px;">
+<div>
+<span class="eyebrow">Natural Language Interface</span>
+<h1>AI Intelligence Assessment</h1>
+<p>Direct interrogation link with the Palantir-Class Analyst. Query the dataset for hidden hotspots and tactical correlations.</p>
+</div>
+<div class="mission-pill" style="color: #F59E0B; border-color: rgba(245, 158, 11, 0.5); background: rgba(245, 158, 11, 0.1);">{status_indicator}</div>
+</div>
+"""
+    st.markdown(header_html, unsafe_allow_html=True)
     
     if not api_key:
         st.error("API Key not found in .env file!")
@@ -27,7 +42,7 @@ def render_ai_assessment(df, api_key):
         chat_container = st.container(border=True)
         if "messages" not in st.session_state:
             st.session_state.messages = [
-                {"role": "assistant", "content": "> **🟢 Neural Link Established.**\n>\n> I am the Palantir-Class Intelligence Node. I have full access to the current geospatial dataset and temporal patterns. How may I assist your analysis?"}
+                {"role": "assistant", "content": "Hello! I'm Safe City Vision AI Assistant. I can help with crime analytics, hotspot analysis, city intelligence, and general questions. How can I assist you today?"}
             ]
 
         with chat_container:
@@ -63,10 +78,30 @@ def render_ai_assessment(df, api_key):
                         )
                         
                         try:
-                            response = assistant.ask_question(prompt, detailed_summary, st.session_state.messages[:-1])
-                            st.markdown(response)
-                            st.session_state.messages.append({"role": "assistant", "content": response})
+                            mode = classify_intent(prompt)
+                            
+                            if not is_connected:
+                                if mode in ["GREETING", "GENERAL_CONVERSATION"]:
+                                    fallback_warning = "Hello! (I am currently running in offline mode and can only provide local data insights right now.)"
+                                    st.markdown(fallback_warning)
+                                    st.session_state.messages.append({"role": "assistant", "content": fallback_warning})
+                                elif mode in ["GENERAL_KNOWLEDGE", "HYBRID_QUERY"]:
+                                    fallback_warning = "⚠️ **AI knowledge mode is unavailable.** I can only provide insights based on local dataset trends right now.\n\n"
+                                    local_intel = fallback_warning + generate_local_intelligence(df)
+                                    st.warning(fallback_warning)
+                                    st.markdown(local_intel)
+                                    st.session_state.messages.append({"role": "assistant", "content": local_intel})
+                                else:
+                                    local_intel = "⚠️ **Intelligence uplink failed:** Transitioning to local intelligence generation.\n\n" + generate_local_intelligence(df)
+                                    st.markdown(local_intel)
+                                    st.session_state.messages.append({"role": "assistant", "content": local_intel})
+                            else:
+                                response = assistant.ask_question(prompt, detailed_summary, st.session_state.messages[:-1], mode=mode)
+                                tagged_response = f"*(Intelligence Mode: {mode})*\n\n{response}"
+                                st.markdown(tagged_response)
+                                st.session_state.messages.append({"role": "assistant", "content": tagged_response})
                         except Exception as e:
-                            error_msg = f"⚠️ **Intelligence uplink failed:** Could not connect to API model. Ensure your Gemini key has `gemini-1.5-flash` access and you have restarted the server.\n\n`Error: {str(e)}`"
+                            logger.error(f"Gemini API Error: {str(e)}", exc_info=True)
+                            error_msg = f"⚠️ **Intelligence uplink failed:** Transitioning to local intelligence generation.\n\n" + generate_local_intelligence(df)
                             st.error(error_msg)
                             st.session_state.messages.append({"role": "assistant", "content": error_msg})

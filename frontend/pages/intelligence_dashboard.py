@@ -3,26 +3,34 @@ import textwrap
 
 from frontend.components.cards import render_recommendation_card, render_tactical_metrics
 from frontend.components.charts import render_temporal_pattern, render_top_threats_chart
-from frontend.services.ai_service import get_ai_summary
+from frontend.services.ai_service import get_ai_summary, check_gemini_connection
 from frontend.services.map_service import render_heatmap
-from frontend.utils.insights import filter_data, generate_operational_summary, risk_score, top_recommendations
+from frontend.utils.insights import filter_data, generate_operational_summary, risk_score, top_recommendations, generate_local_intelligence
 
 
 def render_dashboard(df, current_context, api_key):
     source = st.session_state.get("active_source", current_context)
-    st.markdown(
-        textwrap.dedent(f"""
-            <section class="mission-header">
-                <div>
-                    <span class="eyebrow">Forensic Intelligence Node</span>
-                    <h1>SafeCity Vision</h1>
-                    <p>Live pattern analysis for {source}. Monitor concentration, timing, and threat composition before risk becomes operational pressure.</p>
-                </div>
-                <div class="mission-pill">SYSTEM ONLINE</div>
-            </section>
-        """),
-        unsafe_allow_html=True,
-    )
+    
+    is_connected = check_gemini_connection(api_key) if api_key else False
+    
+    if is_connected and not df.empty:
+        status_indicator = "🟢 AI + Dataset Intelligence"
+    elif not is_connected and not df.empty:
+        status_indicator = "🟡 Dataset Intelligence Only"
+    else:
+        status_indicator = "🔴 Intelligence Services Offline"
+    
+    header_html = f"""
+<section class="mission-header">
+<div>
+<span class="eyebrow">Forensic Intelligence Node</span>
+<h1>SafeCity Vision</h1>
+<p>Live pattern analysis for {source}. Monitor concentration, timing, and threat composition before risk becomes operational pressure.</p>
+</div>
+<div class="mission-pill">{status_indicator}</div>
+</section>
+"""
+    st.markdown(header_html, unsafe_allow_html=True)
 
     if df.empty:
         st.info("No records available. Initialize an uplink or upload a CSV from the sidebar.")
@@ -51,14 +59,21 @@ def render_dashboard(df, current_context, api_key):
 
     with briefing_col:
         st.markdown("<div style='margin-bottom: 16px;'><span class='eyebrow'>Gemini Flash-1.5</span><h3 style='margin: 0; font-size: 1.4rem;'>AI Intelligence Briefing</h3></div>", unsafe_allow_html=True)
-        if api_key:
+        if api_key and is_connected:
             with st.spinner("Generating analyst summary..."):
                 summary_cols = [column for column in ['Crime_Category', 'Hour', 'DayOfWeek', 'Dist_to_Transit'] if column in filtered_df.columns]
                 df_summary = filtered_df[summary_cols].describe(include='all').to_string() if summary_cols else "No summary columns available."
                 briefing = get_ai_summary(api_key, df_summary)
+                if not briefing:
+                    st.warning("⚠️ Gemini connection lost. Entering fallback mode.")
+                    briefing = generate_local_intelligence(filtered_df)
                 st.info(briefing)
         else:
-            st.warning("Add GEMINI_API_KEY in .env to enable generated briefings.")
+            if not api_key:
+                st.warning("Add GEMINI_API_KEY in .env to enable generated briefings.")
+            else:
+                st.warning("⚠️ AI Intelligence is unavailable. Operating in local mode.")
+            st.info(generate_local_intelligence(filtered_df))
 
     with data_col:
         st.markdown("<div style='margin-bottom: 16px;'><span class='eyebrow'>Raw Intercepts</span><h3 style='margin: 0; font-size: 1.4rem;'>Evidence Feed</h3></div>", unsafe_allow_html=True)

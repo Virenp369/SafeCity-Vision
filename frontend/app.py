@@ -88,13 +88,11 @@ if 'session_id' in st.session_state:
     elif selected == "AI Assessment":
         render_ai_assessment(df, api_key)
 else:
-    st.markdown(
-        textwrap.dedent("""
-            <section class="empty-state">
-                <span class="eyebrow">Standby Mode</span>
-                <h1>Initialize Intelligence Node</h1>
-                <p>Awaiting data link. Use the command console to pull a live public-safety node or upload a forensic CSV dataset.</p>
-            </section>
-        """),
-        unsafe_allow_html=True,
-    )
+    empty_state_html = """
+<section class="empty-state">
+<span class="eyebrow">Standby Mode</span>
+<h1>Initialize Intelligence Node</h1>
+<p>Awaiting data link. Use the command console to pull a live public-safety node or upload a forensic CSV dataset.</p>
+</section>
+"""
+    st.markdown(empty_state_html, unsafe_allow_html=True)

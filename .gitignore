@@ -38,6 +38,11 @@ models/*.joblib
 .DS_Store
 Thumbs.db
 
+.claude/
+.claude-flow/
+.swarm/
+.mcp.json
+
 data/raw/*
 data/interim/*
 data/cleaned/*

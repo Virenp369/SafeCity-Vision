@@ -6,13 +6,13 @@ from frontend.utils.insights import risk_band, risk_score
 
 def _render_custom_metric(col, label, value, delta=None):
     delta_html = f"<div style='color: var(--accent-teal); font-size: 0.85rem; margin-top: 4px; font-weight: 600;'>{delta}</div>" if delta else ""
-    html = textwrap.dedent(f"""
-        <div class="tactical-metric-card">
-            <div class="tactical-metric-label">{label}</div>
-            <div class="tactical-metric-value">{value}</div>
-            {delta_html}
-        </div>
-    """)
+    html = f"""
+<div class="tactical-metric-card">
+<div class="tactical-metric-label">{label}</div>
+<div class="tactical-metric-value">{value}</div>
+{delta_html}
+</div>
+"""
     col.markdown(html, unsafe_allow_html=True)
 
 
@@ -43,17 +43,15 @@ def render_tactical_metrics(df, current_context):
 def render_recommendation_card(summary, recommendations, score):
     band, color = risk_band(score)
     items = "".join(f"<li>{item}</li>" for item in recommendations)
-    st.markdown(
-        textwrap.dedent(f"""
-            <section class="intel-brief" style="border-left-color: {color};">
-                <div class="brief-kicker" style="color: {color};">Operational Brief</div>
-                <h3 style="color: #f1f5f9;">{band} Risk Environment</h3>
-                <p>{summary}</p>
-                <ul>{items}</ul>
-            </section>
-        """),
-        unsafe_allow_html=True,
-    )
+    card_html = f"""
+<section class="intel-brief" style="border-left-color: {color};">
+<div class="brief-kicker" style="color: {color};">Operational Brief</div>
+<h3 style="color: #f1f5f9;">{band} Risk Environment</h3>
+<p>{summary}</p>
+<ul>{items}</ul>
+</section>
+"""
+    st.markdown(card_html, unsafe_allow_html=True)
 
 
 def _safe_mode(df, column, fallback):
