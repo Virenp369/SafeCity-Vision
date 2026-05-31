@@ -6,7 +6,7 @@ def render_surveillance():
 <div>
 <span class="eyebrow">Live Feed Integration</span>
 <h1>Surveillance Hub</h1>
-<p>Monitoring active CCTV nodes. Computer vision models are running in the background to detect anomalies in real-time.</p>
+<p>Illustrative computer vision workflow demonstrating how CCTV streams could be analyzed for anomaly detection, person tracking, and incident monitoring in future deployments.</p>
 </div>
 </div>
 """
@@ -55,3 +55,11 @@ ANOMALY DETECTED: 88%
 </div>
 """
         st.markdown(feed2_html, unsafe_allow_html=True)
+
+    st.markdown("<h3 style='margin-top: 32px; margin-bottom: 16px; font-size: 1.25rem;'>Future Capabilities</h3>", unsafe_allow_html=True)
+    st.markdown("""
+- **CCTV Integration**
+- **Vehicle Tracking**
+- **Person Re-identification**
+- **Real-Time Anomaly Detection**
+    """)
