@@ -59,7 +59,7 @@ backend/
     report_service.py     Aggregated intelligence report generation
     risk_service.py       Reusable risk-score API service
   controllers/            Future request orchestration layer
-  middleware/             Future auth/logging/rate-limit middleware
+  middleware/             Future auth/logging/rate-limit middlewared
   database/               Future database adapters and repositories
   config/                 Backend configuration loaders
 ml/

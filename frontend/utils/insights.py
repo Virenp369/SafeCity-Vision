@@ -87,14 +87,12 @@ def classify_intent(query: str) -> str:
     
     greeting_keywords = ["hi", "hello", "hey", "good morning", "good evening", "good afternoon", "greetings"]
     general_conv_keywords = ["who are you", "what can you do", "thank you", "thanks", "how are you"]
-    general_knowledge_keywords = ["tell me about", "what is", "explain", "who is", "criminology", "ipc", "law", "regulation", "international"]
-    crime_data_keywords = ["top crime", "incident count", "how many", "hotspot", "count", "statistic", "number of"]
-    crime_analysis_keywords = ["dominant threat", "trend", "risk", "pattern", "predict", "forecast", "analyze", "analysis", "recommend"]
-    local_keywords = ["dataset", "data", "local", "here", "bharuch"] # used as modifiers
+    general_knowledge_keywords = ["tell me about", "what is", "explain", "who is", "criminology", "ipc", "law", "regulation", "international", "compare", "difference", "history", "crime rate in", "crime in"]
+    crime_data_keywords = ["top crime", "incident count", "how many", "hotspot", "count", "statistic", "number of", "dataset", "loaded data"]
+    crime_analysis_keywords = ["dominant threat", "trend", "risk", "pattern", "predict", "forecast", "analyze", "analysis", "recommend", "insight"]
+    local_keywords = ["here", "current dataset", "this dataset"] 
     
-    # Exact or starts-with matches for greetings
     if any(query == g or query.startswith(g + " ") or query.startswith(g + "!") or query.startswith(g + ",") for g in greeting_keywords):
-        # Could be a greeting, but check if there's more substance
         if len(query.split()) <= 3:
             return "GREETING"
             
@@ -106,9 +104,11 @@ def classify_intent(query: str) -> str:
     has_general_knowledge = any(k in query for k in general_knowledge_keywords)
     has_local = any(k in query for k in local_keywords)
     
-    # Check for hybrid first (local data + general knowledge)
     if (has_data or has_analysis or has_local) and has_general_knowledge:
         return "HYBRID_QUERY"
+        
+    if has_general_knowledge:
+        return "GENERAL_KNOWLEDGE"
         
     if has_analysis:
         return "CRIME_ANALYSIS"
@@ -116,11 +116,7 @@ def classify_intent(query: str) -> str:
     if has_data or has_local:
         return "CRIME_DATA_QUERY"
         
-    if has_general_knowledge:
-        return "GENERAL_KNOWLEDGE"
-        
-    # Default fallback
-    return "CRIME_ANALYSIS"
+    return "GENERAL_KNOWLEDGE"
 
 
 def generate_local_intelligence(df: pd.DataFrame) -> str:

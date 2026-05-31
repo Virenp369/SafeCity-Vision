@@ -1,11 +1,11 @@
 import os
 import sys
-import textwrap
+import pandas as pd
 from pathlib import Path
 
 import streamlit as st
+import textwrap
 from dotenv import load_dotenv
-from streamlit_option_menu import option_menu
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -14,85 +14,84 @@ if str(PROJECT_ROOT) not in sys.path:
 load_dotenv(PROJECT_ROOT / ".env")
 
 st.set_page_config(
-    page_title="SafeCity Vision | Forensic Intelligence",
-    page_icon="SC",
+    page_title="SafeCity Vision | Command Center",
+    page_icon="🚨",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 from frontend.components.sidebar import render_sidebar
-from frontend.pages.ai_assessment import render_ai_assessment
-from frontend.pages.intelligence_dashboard import render_dashboard
-from frontend.pages.ml_lab import render_ml_models
 from frontend.services.data_service import load_session_data
 
+# Page Imports
+from frontend.pages.overview import render_overview
+from frontend.pages.threat_intelligence import render_threat_intelligence
+from frontend.pages.crime_analytics import render_crime_analytics
+from frontend.pages.predictions import render_predictions
+from frontend.pages.surveillance import render_surveillance
+from frontend.pages.ai_assessment import render_ai_assessment
+from frontend.pages.alerts import render_alerts
+from frontend.pages.settings import render_settings
 
 def load_css():
     css_path = Path(__file__).parent / "styles" / "main.css"
     if css_path.exists():
         st.markdown(f"<style>{css_path.read_text(encoding='utf-8')}</style>", unsafe_allow_html=True)
 
-
 load_css()
-render_sidebar()
-
-selected = option_menu(
-    menu_title=None,
-    options=["Intelligence Node", "ML Lab", "AI Assessment"],
-    icons=["radar", "cpu", "chat-square-text"],
-    menu_icon="cast",
-    default_index=0,
-    orientation="horizontal",
-    styles={
-        "container": {
-            "padding": "6px",
-            "background-color": "rgba(13, 20, 33, 0.65)",
-            "border": "1px solid rgba(45, 212, 191, 0.15)",
-            "border-radius": "16px",
-            "margin-bottom": "24px",
-            "box-shadow": "0 8px 32px rgba(0, 0, 0, 0.12)",
-        },
-        "icon": {"color": "#2DD4BF", "font-size": "18px"},
-        "nav-link": {
-            "font-size": "15px",
-            "font-family": "'Inter', sans-serif",
-            "font-weight": "500",
-            "text-align": "center",
-            "margin": "0px 6px",
-            "--hover-color": "rgba(45, 212, 191, 0.1)",
-            "color": "#94A3B8",
-            "border-radius": "12px",
-            "transition": "all 0.3s ease",
-        },
-        "nav-link-selected": {
-            "background-color": "rgba(45, 212, 191, 0.15)",
-            "border": "1px solid rgba(45, 212, 191, 0.4)",
-            "color": "#f1f5f9",
-            "font-weight": "600",
-            "box-shadow": "0 0 15px rgba(45, 212, 191, 0.15)",
-        },
-    },
-)
+selected = render_sidebar()
 
 api_key = os.getenv("GEMINI_API_KEY")
 
-if 'session_id' in st.session_state:
-    session_id = st.session_state['session_id']
-    df = load_session_data(session_id)
-    current_context = st.session_state.get('active_context', "Unknown")
+# Check if we have data or are in demo mode
+has_data = 'session_id' in st.session_state
+demo_mode = st.session_state.get('demo_mode', False)
 
-    if selected == "Intelligence Node":
-        render_dashboard(df, current_context, api_key)
-    elif selected == "ML Lab":
-        render_ml_models(session_id, df)
-    elif selected == "AI Assessment":
+if has_data or demo_mode:
+    if demo_mode and not has_data:
+        # Load a quick dummy dataframe for demo mode if no real data is loaded
+        df = pd.DataFrame({
+            "Latitude": [41.8781, 41.88, 41.89, 41.86, 41.85],
+            "Longitude": [-87.6298, -87.63, -87.64, -87.62, -87.61],
+            "Crime_Category": ["ASSAULT", "THEFT", "ROBBERY", "THEFT", "NARCOTICS"],
+            "Hour": [22, 23, 1, 2, 14],
+            "DayOfWeek": [5, 5, 6, 6, 2],
+            "Dist_to_Transit": [0.1, 0.2, 0.5, 0.1, 1.2],
+            "City": ["Chicago"] * 5
+        })
+        current_context = "GLOBAL"
+        st.session_state['active_source'] = "Demo Simulation Node"
+    else:
+        df = load_session_data(st.session_state['session_id'])
+        current_context = st.session_state.get('active_context', "Unknown")
+
+    # Routing
+    if selected == "Overview":
+        render_overview(df, current_context, api_key)
+    elif selected == "Threat Intelligence":
+        render_threat_intelligence(df, current_context, api_key)
+    elif selected == "Crime Analytics":
+        render_crime_analytics(df, current_context)
+    elif selected == "Predictions":
+        render_predictions()
+    elif selected == "Surveillance":
+        render_surveillance()
+    elif selected == "AI Copilot":
         render_ai_assessment(df, api_key)
+    elif selected == "Alerts":
+        render_alerts(df)
+    elif selected == "Settings":
+        render_settings()
 else:
-    empty_state_html = """
-<section class="empty-state">
-<span class="eyebrow">Standby Mode</span>
-<h1>Initialize Intelligence Node</h1>
-<p>Awaiting data link. Use the command console to pull a live public-safety node or upload a forensic CSV dataset.</p>
-</section>
-"""
-    st.markdown(empty_state_html, unsafe_allow_html=True)
+    # If "Settings" is selected while disconnected, still show it so they can turn on Demo Mode
+    if selected == "Settings":
+        render_settings()
+    else:
+        empty_state_html = """
+        <section class="empty-state">
+        <span class="eyebrow">Standby Mode</span>
+        <h1>Initialize Command Node</h1>
+        <p>Awaiting data link. Use the sidebar console to pull a live public-safety node, upload a forensic dataset, or navigate to Settings to enable Demo Mode.</p>
+        </section>
+        """
+        st.markdown(textwrap.dedent(empty_state_html), unsafe_allow_html=True)

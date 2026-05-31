@@ -17,24 +17,30 @@ logger = logging.getLogger(__name__)
 def render_ai_assessment(df, api_key):
     is_connected = check_gemini_connection(api_key) if api_key else False
     
-    if is_connected and not df.empty:
+    if is_connected:
         status_indicator = "🟢 AI + Dataset Intelligence"
-    elif not is_connected and not df.empty:
-        status_indicator = "🟡 Dataset Intelligence Only"
+        status_color = "#10B981" # Green
     else:
-        status_indicator = "🔴 Intelligence Services Offline"
-    
+        status_indicator = "🟡 Dataset Intelligence Only"
+        status_color = "#F59E0B" # Amber
+
     header_html = f"""
 <div class="mission-header" style="margin-bottom: 32px;">
 <div>
-<span class="eyebrow">Natural Language Interface</span>
-<h1>AI Intelligence Assessment</h1>
-<p>Direct interrogation link with the Palantir-Class Analyst. Query the dataset for hidden hotspots and tactical correlations.</p>
+<span class="eyebrow">Conversational Intelligence</span>
+<h1>AI Copilot</h1>
+<p>Direct interrogation link with the Palantir-Class Analyst. Query the dataset for hidden hotspots, cross-reference global crime trends, and extract tactical correlations.</p>
 </div>
-<div class="mission-pill" style="color: #F59E0B; border-color: rgba(245, 158, 11, 0.5); background: rgba(245, 158, 11, 0.1);">{status_indicator}</div>
+<div style="display: flex; flex-direction: column; align-items: flex-end;">
+<div class="mission-pill" style="color: {status_color}; border-color: {status_color}; background: transparent;">{status_indicator}</div>
+</div>
 </div>
 """
     st.markdown(header_html, unsafe_allow_html=True)
+    
+    if df.empty:
+        st.info("No dataset loaded. Upload a CSV or enable Demo Mode in Settings.")
+        return
     
     if not api_key:
         st.error("API Key not found in .env file!")
@@ -79,6 +85,7 @@ def render_ai_assessment(df, api_key):
                         
                         try:
                             mode = classify_intent(prompt)
+                            logger.info(f"AI Query Intent Mode: {mode}")
                             
                             if not is_connected:
                                 if mode in ["GREETING", "GENERAL_CONVERSATION"]:
@@ -97,9 +104,8 @@ def render_ai_assessment(df, api_key):
                                     st.session_state.messages.append({"role": "assistant", "content": local_intel})
                             else:
                                 response = assistant.ask_question(prompt, detailed_summary, st.session_state.messages[:-1], mode=mode)
-                                tagged_response = f"*(Intelligence Mode: {mode})*\n\n{response}"
-                                st.markdown(tagged_response)
-                                st.session_state.messages.append({"role": "assistant", "content": tagged_response})
+                                st.markdown(response)
+                                st.session_state.messages.append({"role": "assistant", "content": response})
                         except Exception as e:
                             logger.error(f"Gemini API Error: {str(e)}", exc_info=True)
                             error_msg = f"⚠️ **Intelligence uplink failed:** Transitioning to local intelligence generation.\n\n" + generate_local_intelligence(df)
