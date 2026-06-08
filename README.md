@@ -33,64 +33,91 @@ Backend Services -> ML Preprocessing -> Streamlit Intelligence Dashboard
 ## Project Structure
 
 ```text
-PROJECT_STRUCTURE.md       Complete repository navigation guide
-docs/                      Architecture, data dictionary, and presentation guide
-frontend/
-  app.py                  Streamlit entry point
-  pages/                  Dashboard, ML lab, AI assessment pages
-  components/             Reusable UI cards, charts, sidebar
-  layouts/                Layout shells and page composition helpers
-  services/               Data loading, AI, map helpers
-  assets/                 Frontend-only visual assets
-  utils/                  Insight and risk helpers
-backend/
-  api/                    FastAPI app and route definitions
-    main.py               API factory and router registration
-    app.py                Backward-compatible uvicorn entry point
-    routes/               Health, model status, and prediction endpoints
-    schemas/              Request/response validation models
-  services/               City data harvesting and backend orchestration
-    alert_service.py      Rule-based operational alert evaluation
-    analytics_service.py  Dataset summaries and intelligent filtering
-    data_validation_service.py Dataset validation and enrichment orchestration
-    forecast_service.py   Crime-volume trend forecasting
-    hotspot_service.py    Coordinate-based hotspot detection
-    model_service.py      Model artifact status and prediction orchestration
-    report_service.py     Aggregated intelligence report generation
-    risk_service.py       Reusable risk-score API service
-  controllers/            Future request orchestration layer
-  middleware/             Future auth/logging/rate-limit middlewared
-  database/               Future database adapters and repositories
-  config/                 Backend configuration loaders
-ml/
-  training/               Model training and compatibility modules
-    model_factory.py      Model architecture selection
-    model_trainer.py      Backward-compatible training facade
-  preprocessing/          Feature engineering and enrichment
-    feature_enricher.py   Temporal and location-derived feature enrichment
-    schema_normalizer.py  CSV alias mapping into canonical crime schema
-    schema_validator.py   Reusable dataset column validation
-    data_quality.py       Dataset consistency and quality reporting
-  inference/              Prediction and risk scoring services
-    prediction_service.py Saved model inference orchestration
-    risk_scoring.py       Risk-score and explanation helpers
-  forecasting/            Forecasting and anomaly detection
-    anomaly_detector.py   Statistical anomaly detection for spikes and concentrations
-  clustering/             Hotspot clustering helpers
-    hotspot_detector.py   Cluster assignment for trained hotspot models
-  models/                 Serialized model artifacts
-ai_assistant/
-  integrations/           Gemini/LangChain assistant integration
-  prompts/                Prompt templates
-  chains/                 Future LLM chains
-  context/                Dataset-to-LLM context builders
-  memory/                 Future assistant memory adapters
-maps/                     Heatmaps, GeoJSON, and map layers
-data/                     Raw, interim, cleaned, processed, exported datasets
-config/                   Non-secret configuration templates
-scripts/                  Utility scripts and automation helpers
-tests/                    Automated test workspace
-reports/                  Generated analysis outputs
+Crime-Analytics-AI/
+│
+├── PROJECT_STRUCTURE.md                 # Complete repository navigation guide
+│
+├── docs/                                # Architecture, data dictionary, presentation guide
+│
+├── frontend/
+│   ├── app.py                           # Streamlit entry point
+│   │
+│   ├── pages/                           # Dashboard, ML lab, AI assessment pages
+│   ├── components/                      # Reusable UI cards, charts, sidebar
+│   ├── layouts/                         # Layout shells and page composition helpers
+│   ├── services/                        # Data loading, AI, map helpers
+│   ├── assets/                          # Frontend visual assets
+│   └── utils/                           # Insight and risk helpers
+│
+├── backend/
+│   ├── api/
+│   │   ├── main.py                      # API factory and router registration
+│   │   ├── app.py                       # Uvicorn entry point
+│   │   │
+│   │   ├── routes/                      # Health, status, prediction endpoints
+│   │   └── schemas/                     # Request/response validation models
+│   │
+│   ├── services/
+│   │   ├── alert_service.py             # Operational alert evaluation
+│   │   ├── analytics_service.py         # Dataset analytics and filtering
+│   │   ├── data_validation_service.py   # Validation and enrichment
+│   │   ├── forecast_service.py          # Crime forecasting
+│   │   ├── hotspot_service.py           # Hotspot detection
+│   │   ├── model_service.py             # Prediction orchestration
+│   │   ├── report_service.py            # Intelligence reports
+│   │   └── risk_service.py              # Risk score service
+│   │
+│   ├── controllers/                     # Request orchestration layer
+│   ├── middleware/                      # Auth, logging, rate limiting
+│   ├── database/                        # Database adapters/repositories
+│   └── config/                          # Backend configuration
+│
+├── ml/
+│   ├── training/
+│   │   ├── model_factory.py             # Model architecture selection
+│   │   └── model_trainer.py             # Training pipeline
+│   │
+│   ├── preprocessing/
+│   │   ├── feature_enricher.py          # Feature engineering
+│   │   ├── schema_normalizer.py         # Schema standardization
+│   │   ├── schema_validator.py          # Dataset validation
+│   │   └── data_quality.py              # Data quality reporting
+│   │
+│   ├── inference/
+│   │   ├── prediction_service.py        # Model inference
+│   │   └── risk_scoring.py              # Risk score generation
+│   │
+│   ├── forecasting/
+│   │   └── anomaly_detector.py          # Anomaly detection
+│   │
+│   ├── clustering/
+│   │   └── hotspot_detector.py          # Crime hotspot clustering
+│   │
+│   └── models/                          # Serialized ML models
+│
+├── ai_assistant/
+│   ├── integrations/                    # Gemini/LangChain integrations
+│   ├── prompts/                         # Prompt templates
+│   ├── chains/                          # LLM chains
+│   ├── context/                         # Dataset context builders
+│   └── memory/                          # Assistant memory modules
+│
+├── maps/                                # Heatmaps, GeoJSON, map layers
+│
+├── data/
+│   ├── raw/                             # Original datasets
+│   ├── interim/                         # Intermediate datasets
+│   ├── cleaned/                         # Cleaned datasets
+│   ├── processed/                       # Feature-engineered datasets
+│   └── exported/                        # Reports and exports
+│
+├── config/                              # Global configuration templates
+│
+├── scripts/                             # Automation and utility scripts
+│
+├── tests/                               # Unit and integration tests
+│
+└── reports/                             # Generated analysis reports
 ```
 
 See `PROJECT_STRUCTURE.md` for the full clean folder layout.
