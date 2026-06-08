@@ -3,12 +3,12 @@
 
 AI-powered crime pattern prediction and forensic analytics platform for hotspot analysis, risk scoring, geospatial intelligence, and analyst briefings.
 
-## What It Does
+## How it works
 
 - Ingests public crime data or user-uploaded CSV files.
 - Enriches records with temporal and location-derived features.
 - Visualizes high-risk areas through interactive heatmaps.
-- Trains XGBoost, Random Forest, Logistic Regression, and KMeans models.
+- Trains  ML models like XGBoost, Random Forest, Logistic Regression, and KMeans models.
 - Produces risk scores, threat summaries, and AI-generated analyst briefings.
 - Exposes a small FastAPI model-serving surface for deployment readiness.
 
